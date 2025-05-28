@@ -1,0 +1,85 @@
+<tool id="beast2" name="BEAST2" version="2.7.7" profile="22.01">
+    <description>Bayesian Evolutionary Analysis Sampling Trees</description>
+    
+    <requirements>
+        <requirement type="package" version="2.7.7" channel="millerjeremya">beast2</requirement>
+    </requirements>
+    
+    <version_command>beast -version 2>&1 | head -1</version_command>
+    
+    <command detect_errors="exit_code"><![CDATA[
+        ## Copy input XML file
+        cp '$input_xml' beast_input.xml &&
+        
+        ## Run BEAST2
+        beast
+            -threads \${GALAXY_SLOTS:-1}
+            -overwrite
+            beast_input.xml &&
+            
+        ## Copy outputs to Galaxy expected locations
+        cp beast_input.log '$log_output' &&
+        cp beast_input.trees '$trees_output'
+    ]]></command>
+    
+    <inputs>
+        <param name="input_xml" type="data" format="xml" label="BEAST XML configuration file" 
+               help="Pre-configured BEAST2 XML file containing analysis settings"/>
+        <param name="chain_length" type="integer" value="10000" min="1000" max="100000000"
+               label="Override MCMC chain length (optional)" optional="true"
+               help="If specified, will override the chain length in the XML file"/>
+    </inputs>
+    
+    <outputs>
+        <data name="log_output" format="tabular" label="${tool.name} on ${on_string}: Parameter log"
+              help="MCMC parameter samples and log-likelihood values"/>
+        <data name="trees_output" format="newick" label="${tool.name} on ${on_string}: Tree samples"
+              help="MCMC tree samples in Newick format"/>
+    </outputs>
+    
+    <tests>
+        <test>
+            <param name="input_xml" value="test_simple.xml"/>
+            <output name="log_output" file="test_simple.log" lines_diff="10"/>
+            <output name="trees_output" file="test_simple.trees" lines_diff="10"/>
+        </test>
+    </tests>
+    
+    <help><![CDATA[
+**What it does**
+
+BEAST2 is a cross-platform program for Bayesian phylogenetic analysis of molecular sequences. 
+It estimates rooted, time-measured phylogenies using strict or relaxed molecular clock models.
+
+**Input**
+
+A BEAST2 XML configuration file containing:
+- Sequence alignment data
+- Analysis parameters (substitution model, clock model, tree prior)
+- MCMC settings (chain length, sampling frequency)
+
+You can create XML files using BEAUti (BEAST2's GUI application) or other tools.
+
+**Output**
+
+- **Parameter log**: Tab-delimited file with MCMC parameter samples and log-likelihood values
+- **Tree samples**: Collection of phylogenetic trees sampled during the MCMC analysis
+
+**Usage Tips**
+
+- For test runs, use shorter chain lengths (10,000 - 100,000 steps)
+- For production analyses, use longer chains (10,000,000+ steps)
+- Check parameter log file for convergence diagnostics
+- Use multiple independent runs and combine results for robust inference
+
+**Citation**
+
+Bouckaert, R., Vaughan, T. G., Barido-Sottani, J., Duchêne, S., Fourment, M., Gavryushkina, A., ... & Drummond, A. J. (2019). 
+BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis. 
+PLoS computational biology, 15(4), e1006650.
+    ]]></help>
+    
+    <citations>
+        <citation type="doi">10.1371/journal.pcbi.1006650</citation>
+    </citations>
+</tool>
