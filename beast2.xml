@@ -5,7 +5,7 @@
         <requirement type="package" version="2.7.7">beast2</requirement>
     </requirements>
     
-    <version_command>beast -version 2>&1 | head -1</version_command>
+    <version_command>beast -version 2&gt;&amp;1 | head -1</version_command>
     
     <command detect_errors="exit_code"><![CDATA[
         ## Copy input XML file
