@@ -39,7 +39,8 @@ jobs:
       with:
         create-cache: true
         galaxy-fork: galaxyproject
-        galaxy-branch: release_23.2
+        galaxy-branch: release_24.0
+        python-version: '3.11'
         max-chunks: 0
     - name: Show repository list
       run: echo '${{ steps.discover.outputs.repository-list }}'
@@ -54,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.11']
     steps:
     - uses: actions/checkout@v4
       with:
@@ -65,7 +66,8 @@ jobs:
         repository-list: ${{ needs.setup.outputs.repository-list }}
         biocontainer: auto
         galaxy-fork: galaxyproject
-        galaxy-branch: release_23.2
+        galaxy-branch: release_24.0
+        python-version: '3.11'
 
   test:
     name: Test tools
@@ -76,7 +78,7 @@ jobs:
       fail-fast: false
       matrix:
         chunk: ${{ fromJson(needs.setup.outputs.tool-list) }}
-        python-version: ['3.8']
+        python-version: ['3.11']
     steps:
     - uses: actions/checkout@v4
       with:
@@ -87,7 +89,8 @@ jobs:
         repository-list: ${{ needs.setup.outputs.repository-list }}
         tool-list: ${{ matrix.chunk }}
         galaxy-fork: galaxyproject
-        galaxy-branch: release_23.2
+        galaxy-branch: release_24.0
+        python-version: '3.11'
 
   combine_outputs:
     name: Combine chunked test results
@@ -124,7 +127,8 @@ jobs:
         shed-target: testtoolshed
         shed-key: ${{ secrets.TESTTOOLSHED_API_KEY }}
         galaxy-fork: galaxyproject
-        galaxy-branch: release_23.2
+        galaxy-branch: release_24.0
+        python-version: '3.11'
 
   # Alternative: Deploy on version tag push (instead of release)
   deploy-on-tag:
