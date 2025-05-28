@@ -2,7 +2,7 @@
     <description>Bayesian Evolutionary Analysis Sampling Trees</description>
     
     <requirements>
-        <requirement type="package" version="2.7.7" channel="millerjeremya">beast2</requirement>
+        <requirement type="package" version="2.7.7">beast2</requirement>
     </requirements>
     
     <version_command>beast -version 2>&1 | head -1</version_command>
