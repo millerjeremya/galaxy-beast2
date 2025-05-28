@@ -109,7 +109,7 @@ jobs:
 
   # Deploy to ToolShed only on release
   deploy:
-    name: Deploy tools to ToolShed
+    name: Deploy tools to Test ToolShed
     needs: [lint, test, combine_outputs]
     if: github.event_name == 'release' && github.event.action == 'published'
     runs-on: ubuntu-latest
@@ -121,14 +121,14 @@ jobs:
       with:
         mode: deploy
         repository-list: ${{ needs.setup.outputs.repository-list }}
-        shed-target: toolshed
-        shed-key: ${{ secrets.TOOLSHED_API_KEY }}
+        shed-target: testtoolshed
+        shed-key: ${{ secrets.TESTTOOLSHED_API_KEY }}
         galaxy-fork: galaxyproject
         galaxy-branch: release_23.2
 
   # Alternative: Deploy on version tag push (instead of release)
   deploy-on-tag:
-    name: Deploy tools to ToolShed (on version tag)
+    name: Deploy tools to Test ToolShed (on version tag)
     needs: [lint, test, combine_outputs]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
@@ -140,7 +140,7 @@ jobs:
       with:
         mode: deploy
         repository-list: ${{ needs.setup.outputs.repository-list }}
-        shed-target: toolshed
-        shed-key: ${{ secrets.TOOLSHED_API_KEY }}
+        shed-target: testtoolshed
+        shed-key: ${{ secrets.TESTTOOLSHED_API_KEY }}
         galaxy-fork: galaxyproject
         galaxy-branch: release_23.2
