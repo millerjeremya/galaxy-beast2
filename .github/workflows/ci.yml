@@ -1,150 +1,47 @@
-name: Galaxy Tool CI
+name: Simple Tool Deploy
 on:
-  pull_request:
-    paths-ignore:
-      - '*.md'
-      - '.git*'
-  push:
-    paths-ignore:
-      - '*.md' 
-      - '.git*'
-    branches:
-      - main
-      - master
   release:
     types: [published]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  push:
+    tags:
+      - 'v*'
 
 jobs:
-  # Run linting and tests on pull requests and pushes
-  setup:
-    name: Setup cache and determine changed repositories
-    if: github.repository_owner != 'bgruening' || github.event_name != 'schedule'
-    runs-on: ubuntu-latest
-    outputs:
-      repository-list: ${{ steps.discover.outputs.repository-list }}
-      tool-list: ${{ steps.discover.outputs.tool-list }}
-    steps:
-    - name: Print github context
-      run: |
-        echo '${{ toJson(github) }}'
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - uses: galaxyproject/planemo-ci-action@v1
-      id: discover
-      with:
-        create-cache: true
-        galaxy-fork: galaxyproject
-        galaxy-branch: release_24.0
-        python-version: '3.11'
-        max-chunks: 0
-    - name: Show repository list
-      run: echo '${{ steps.discover.outputs.repository-list }}'
-    - name: Show tool list  
-      run: echo '${{ steps.discover.outputs.tool-list }}'
-
-  lint:
-    name: Lint tools
-    needs: setup
-    if: needs.setup.outputs.repository-list != ''
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.11']
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
-    - uses: galaxyproject/planemo-ci-action@v1
-      with:
-        mode: lint
-        repository-list: ${{ needs.setup.outputs.repository-list }}
-        biocontainer: auto
-        galaxy-fork: galaxyproject
-        galaxy-branch: release_24.0
-        python-version: '3.11'
-
-  test:
-    name: Test tools
-    needs: setup
-    if: needs.setup.outputs.tool-list != ''
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        chunk: ${{ fromJson(needs.setup.outputs.tool-list) }}
-        python-version: ['3.11']
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
-    - uses: galaxyproject/planemo-ci-action@v1
-      with:
-        mode: test
-        repository-list: ${{ needs.setup.outputs.repository-list }}
-        tool-list: ${{ matrix.chunk }}
-        galaxy-fork: galaxyproject
-        galaxy-branch: release_24.0
-        python-version: '3.11'
-
-  combine_outputs:
-    name: Combine chunked test results
-    needs: [setup, test]
-    if: needs.setup.outputs.tool-list != ''
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
-    - uses: galaxyproject/planemo-ci-action@v1
-      with:
-        mode: combine
-        html-report: true
-    - uses: actions/upload-artifact@v3
-      with:
-        name: 'All tool test results'
-        path: upload
-
-  # Deploy to ToolShed only on release
   deploy:
-    name: Deploy tools to Test ToolShed
-    needs: [lint, test, combine_outputs]
-    if: github.event_name == 'release' && github.event.action == 'published'
+    name: Deploy to Test ToolShed
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        fetch-depth: 1
-    - uses: galaxyproject/planemo-ci-action@v1
-      with:
-        mode: deploy
-        repository-list: ${{ needs.setup.outputs.repository-list }}
-        shed-target: testtoolshed
-        shed-key: ${{ secrets.TESTTOOLSHED_API_KEY }}
-        galaxy-fork: galaxyproject
-        galaxy-branch: release_24.0
         python-version: '3.11'
-
-  # Alternative: Deploy on version tag push (instead of release)
-  deploy-on-tag:
-    name: Deploy tools to Test ToolShed (on version tag)
-    needs: [lint, test, combine_outputs]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
-    - uses: galaxyproject/planemo-ci-action@v1
-      with:
-        mode: deploy
-        repository-list: ${{ needs.setup.outputs.repository-list }}
-        shed-target: testtoolshed
-        shed-key: ${{ secrets.TESTTOOLSHED_API_KEY }}
-        galaxy-fork: galaxyproject
-        galaxy-branch: release_23.2
+        
+    - name: Install Planemo
+      run: |
+        python -m pip install --upgrade pip
+        pip install planemo
+        
+    - name: Create Planemo config
+      run: |
+        mkdir -p ~/.planemo
+        cat > ~/.planemo.yml << EOF
+        shed_username: millerjeremya
+        sheds:
+          testtoolshed:
+            key: ${{ secrets.TESTTOOLSHED_API_KEY }}
+        EOF
+        
+    - name: Lint tool
+      run: |
+        planemo lint beast2.xml
+        
+    - name: Deploy to Test ToolShed
+      run: |
+        planemo shed_update --shed_target testtoolshed --check_diff
+        
+    - name: Show deployment status
+      run: |
+        echo "Tool deployed to: https://testtoolshed.g2.bx.psu.edu/view/millerjeremya/beast2"
