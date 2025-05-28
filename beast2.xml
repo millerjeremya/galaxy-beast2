@@ -23,18 +23,14 @@
     ]]></command>
     
     <inputs>
-        <param name="input_xml" type="data" format="xml" label="BEAST XML configuration file" 
-               help="Pre-configured BEAST2 XML file containing analysis settings"/>
+        <param name="input_xml" type="data" format="xml" label="BEAST XML configuration file"/>
         <param name="chain_length" type="integer" value="10000" min="1000" max="100000000"
-               label="Override MCMC chain length (optional)" optional="true"
-               help="If specified, will override the chain length in the XML file"/>
+               label="Override MCMC chain length (optional)" optional="true"/>
     </inputs>
     
     <outputs>
-        <data name="log_output" format="tabular" label="${tool.name} on ${on_string}: Parameter log"
-              help="MCMC parameter samples and log-likelihood values"/>
-        <data name="trees_output" format="newick" label="${tool.name} on ${on_string}: Tree samples"
-              help="MCMC tree samples in Newick format"/>
+        <data name="log_output" format="tabular" label="${tool.name} on ${on_string}: Parameter log"/>
+        <data name="trees_output" format="newick" label="${tool.name} on ${on_string}: Tree samples"/>
     </outputs>
     
     <tests>
