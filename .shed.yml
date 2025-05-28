@@ -1,12 +1,14 @@
-name: beast2_test
-owner: millerjeremya
+name: suite_beast2
+owner: millerjeremya  # Your actual ToolShed username
 description: BEAST2 - Bayesian evolutionary analysis sampling trees
 long_description: |
   BEAST2 is a cross-platform program for Bayesian MCMC analysis of molecular sequences.
   It estimates rooted, time-measured phylogenies using strict or relaxed molecular clock models.
   This tool wrapper allows running BEAST2 analyses within Galaxy workflows.
 homepage_url: https://www.beast2.org/
-remote_repository_url: https://github.com/millerjeremya/galaxy-beast2
+remote_repository_url: https://github.com/yourusername/galaxy-beast2  # Optional: your repo URL
 categories:
   - Phylogenetics
-  - Evolution
+auto_tool_repositories:
+  name_template: "${repository_name}"
+  description_template: "${repository_description}"
