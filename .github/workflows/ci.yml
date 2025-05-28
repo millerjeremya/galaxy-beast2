@@ -40,7 +40,7 @@ jobs:
         
     - name: Deploy to Test ToolShed
       run: |
-        planemo shed_update --shed_target testtoolshed --check_diff
+        planemo shed_upload --shed_target testtoolshed --name beast2_test
         
     - name: Show deployment status
       run: |
