@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<tool_dependency>
+    <package name="beast2" version="2.7.7">
+        <install version="1.0">
+            <actions>
+                <action type="setup_virtualenv">
+                    <requirement type="package" version="2.7.7">beast2</requirement>
+                </action>
+            </actions>
+        </install>
+        <readme>
+            BEAST2 v2.7.7 - Bayesian evolutionary analysis sampling trees
+            
+            This package installs BEAST2 from conda-forge.
+            
+            For more information about BEAST2, visit: https://www.beast2.org/
+        </readme>
+    </package>
+</tool_dependency>
