@@ -1,40 +1,12 @@
 name: beast2_test
-owner: millerjeremya  # Replace with your ToolShed username
+owner: millerjeremya
 description: BEAST2 - Bayesian evolutionary analysis sampling trees
 long_description: |
-  BEAST2 is a cross-platform program for Bayesian MCMC analysis of molecular sequences. 
-  It estimates rooted, time-measured phylogenies using strict or relaxed molecular clock models. 
-  It can be used as a method of reconstructing phylogenies but is also a framework for 
-  testing evolutionary hypotheses without conditioning on a single tree topology.
-  
-  This tool wraps BEAST2 v2.7.7 and provides an easy interface for running Bayesian 
-  phylogenetic analyses in Galaxy workflows. It supports both pre-configured XML files 
-  and automatic XML generation from sequence alignments.
-
+  BEAST2 is a cross-platform program for Bayesian MCMC analysis of molecular sequences.
+  It estimates rooted, time-measured phylogenies using strict or relaxed molecular clock models.
+  This tool wrapper allows running BEAST2 analyses within Galaxy workflows.
+homepage_url: https://www.beast2.org/
+remote_repository_url: https://github.com/millerjeremya/galaxy-beast2
 categories:
   - Phylogenetics
   - Evolution
-
-homepage_url: https://www.beast2.org/
-remote_repository_url: https://github.com/millerjeremya/galaxy-beast2
-
-type: unrestricted
-
-auto_tool_repositories:
-  name_template: "{{ tool_id }}"
-  description_template: "{{ tool_name }} - {{ tool_description }}"
-
-suite:
-  name: "suite_beast2"
-  description: "BEAST2 phylogenetic analysis suite"
-  long_description: |
-    Complete suite of BEAST2 tools for Bayesian phylogenetic analysis including:
-    - BEAST2: Main MCMC analysis
-    - TreeAnnotator: Annotate trees with posterior probabilities  
-    - LogCombiner: Combine log files from multiple runs
-    - Tracer integration: Visualize MCMC traces
-
-include:
-  - beast2.xml
-  - test-data/
-  - README.md
